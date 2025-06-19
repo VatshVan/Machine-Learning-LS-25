@@ -1,0 +1,30 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the fork
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+
+      - name: Add Upstream
+        run: git remote add upstream https://github.com/wncc/Machine-Learning-LS-25.git
+
+      - name: Fetch Upstream
+        run: git fetch upstream
+
+      - name: Merge Upstream changes
+        run: git merge upstream/main --allow-unrelated-histories --no-edit || echo "No changes to merge"
+
+      - name: Push changes
+        run: git push origin main
